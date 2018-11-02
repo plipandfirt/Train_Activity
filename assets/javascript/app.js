@@ -1,14 +1,15 @@
-// // 1. Initialize Firebase
-// var config = {
-//     apiKey: "AIzaSyA_QypGPkcjPtylRDscf7-HQl8ribnFeIs",
-//     authDomain: "time-sheet-55009.firebaseapp.com",
-//     databaseURL: "https://time-sheet-55009.firebaseio.com",
-//     storageBucket: "time-sheet-55009.appspot.com"
-//   };
+  // 1.0 Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyDdwmu16La63gG81Qq2vTNOvsXQBVZvxuI",
+    authDomain: "train-activity-d7515.firebaseapp.com",
+    databaseURL: "https://train-activity-d7515.firebaseio.com",
+    projectId: "train-activity-d7515",
+    storageBucket: "",
+    messagingSenderId: "812613202491"
+  };
+  firebase.initializeApp(config);
   
-//   firebase.initializeApp(config);
-  
-//   var database = firebase.database();
+  var database = firebase.database();
   
   // 2. Button for adding Trains
   $("#add-train-btn").on("click", function(event) {
@@ -17,14 +18,14 @@
     // Grabs user input
     var trainName = $("#train-name-input").val().trim();
     var trainDestination = $("#destination-input").val().trim();
-    var trainStart = moment($("#start-input").val().trim(), "MM/DD/YYYY").format("X");
+    var firstTime = moment($("#start-input").val().trim(), "hh:mm").format("X");
     var trainFrequency = $("#frequency-input").val().trim();
   
     // Creates local "temporary" object for holding train data
     var newTrain = {
       name: trainName,
       destination: trainDestination,
-      start: trainStart,
+      start: firstTime,
       frequency: trainFrequency
     };
   
@@ -37,7 +38,7 @@
     console.log(newTrain.start);
     console.log(newTrain.frequency);
   
-    alert("Train successfully added");
+    // alert("Train successfully added");
   
     // Clears all of the text-boxes
     $("#train-name-input").val("");
@@ -52,46 +53,51 @@
   
     // Store everything into a variable.
     var trainName = childSnapshot.val().name;
-    var trainDestination = childSnapshot.val().role;
-    var trainStart = childSnapshot.val().start;
-    var trainFrequency = childSnapshot.val().rate;
+    var trainDestination = childSnapshot.val().destination;
+    var firstTime = childSnapshot.val().start;
+    var trainFrequency = childSnapshot.val().frequency;
   
     // Train Info
     console.log(trainName);
     console.log(trainDestination);
-    console.log(trainStart);
+    console.log(firstTime);
     console.log(trainFrequency);
   
-    // Prettify the train start
-    var trainStartPretty = moment.unix(trainStart).format("MM/DD/YYYY");
-  
-    // Calculate the months worked using hardcore math
-    // To calculate the months worked
-    var trainMonths = moment().diff(moment(trainStart, "X"), "months");
-    console.log(trainMonths);
-  
-    // Calculate the minutes away
-    var trainBilled = trainMonths * trainRate;
-    console.log(trainBilled);
-  
+    // Time is 3:30 AM
+    var firstTime = "03:30";
+
+    // First Time (pushed back 1 year to make sure it comes before current time)
+    var firstTimeConverted = moment(firstTime, "hh:mm").subtract(1, "years");
+    console.log(firstTimeConverted);
+
+    // Current Time
+    var currentTime = moment();
+    console.log("CURRENT TIME: " + moment(currentTime).format("hh:mm"));
+
+    // Difference between the times
+    var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
+    console.log("DIFFERENCE IN TIME: " + diffTime);
+
+    // Time apart (remainder)
+    var tRemainder = diffTime % trainFrequency;
+    console.log(tRemainder);
+
+    // Minute Until Train
+    var tMinutesTillTrain = trainFrequency - tRemainder;
+    console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
+
+    // Next Train
+    var nextTrain = moment().add(tMinutesTillTrain, "minutes");
+    console.log("ARRIVAL TIME: " + moment(nextTrain).format("hh:mm"));
+    
+
     // Create the new row
     var newRow = $("<tr>").append(
       $("<td>").text(trainName),
       $("<td>").text(trainDestination),
-      $("<td>").text(trainStartPretty),
-      $("<td>").text(trainMonths),
-      $("<td>").text(trainRate),
-      $("<td>").text(trainBilled)
     );
   
     // Append the new row to the table
     $("#train-table > tbody").append(newRow);
   });
   
-  // Example Time Math
-  // -----------------------------------------------------------------------------
-  // Assume Train start date of January 1, 2015
-  // Assume current date is March 1, 2016
-  
-  // We know that this is 15 months.
-  // Now we will create code in moment.js to confirm that any attempt we use meets this test case
