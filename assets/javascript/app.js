@@ -24,7 +24,7 @@ $("#add-train-btn").on("click", function (event) {
   // Grabs user input
   var trainName = $("#train-name-input").val();
   var trainDestination = $("#destination-input").val();
-  var firstTime = moment($("#start-input").val().trim(), "hh:mm").format("X");
+  var firstTime = $("#start-input").val().trim();
   var trainFrequency = $("#frequency-input").val().trim();
 
   // Creates local "temporary" object for holding train data
@@ -39,10 +39,10 @@ $("#add-train-btn").on("click", function (event) {
   database.ref().push(newTrain);
 
   // Logs everything to console
-  console.log(newTrain.name);
-  console.log(newTrain.destination);
-  console.log(newTrain.start);
-  console.log(newTrain.frequency);
+  console.log('train name:', newTrain.name);
+  console.log('destination:', newTrain.destination);
+  console.log('start:', newTrain.start);
+  console.log('frequency:', newTrain.frequency);
 
   // alert("Train successfully added");
 
@@ -70,11 +70,24 @@ database.ref().on("child_added", function (childSnapshot) {
   console.log(trainFrequency);
 
   // Time is 3:30 AM
-  var firstTime = "03:30";
+
 
   // First Time (pushed back 1 year to make sure it comes before current time)
+  var timeArr = firstTime.split(':');
+  var trainTime = moment().hours(timeArr[0]).minutes(timeArr[1]);
+
+  var minutesAway, arrival;
+
+  var differenceInTimes = moment().diff(trainTime, "minutes");
+  // remainder, which is the difference % frequency
+  // reassign minutesAway to trainFrequency minus remainder
+
+  //reassign arrival to moment object, chaining on add(minutesAway) and format(ex: hh:mm)
+
+  console.log('time difference:', differenceInTimes);
+
   var firstTimeConverted = moment(firstTime, "hh:mm").subtract(1, "years");
-  console.log(firstTimeConverted);
+  console.log('first time converted', firstTimeConverted);
 
   // Current Time
   var currentTime = moment();
@@ -96,11 +109,15 @@ database.ref().on("child_added", function (childSnapshot) {
   var nextTrain = moment().add(tMinutesTillTrain, "minutes");
   console.log("ARRIVAL TIME: " + moment(nextTrain).format("hh:mm"));
 
+  var minAway = nextTrain.diff(moment(), "minutes");
 
   // Create the new row
   var newRow = $("<tr>").append(
     $("<td>").text(trainName),
     $("<td>").text(trainDestination),
+    $("<td>").text(trainFrequency),
+    $("<td>").text(nextTrain.format("hh:mm")),
+    $("<td>").text(minAway),
   );
 
   // Append the new row to the table
