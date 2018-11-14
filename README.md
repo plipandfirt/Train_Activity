@@ -1,4 +1,4 @@
-# Firebase Assignment - Train Scheduler (Basic - Recommended)
+# Firebase Assignment - Train Scheduler (Basic)
 
 ##### _Because that Rock Paper Scissors Game is Too Damn Hard_
 
